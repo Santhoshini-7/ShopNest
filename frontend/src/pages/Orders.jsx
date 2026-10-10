@@ -1,0 +1,12 @@
+import React,{useEffect,useState} from 'react';
+import {Link} from 'react-router-dom';
+import {Package,ChevronRight,RefreshCw} from 'lucide-react';
+import {ordersApi} from '../services/api';
+import {money,formatDate,statusLabel,statusClass} from '../utils/commerce';
+
+export default function Orders(){
+ const [orders,setOrders]=useState([]); const [loading,setLoading]=useState(true); const [error,setError]=useState('');
+ const load=()=>{setLoading(true);setError('');ordersApi.getMyOrders().then(r=>setOrders(r.data?.data||[])).catch(e=>setError(e.response?.data?.message||'Unable to load orders.')).finally(()=>setLoading(false))};
+ useEffect(load,[]);
+ return <section className="max-w-5xl mx-auto px-4 sm:px-6 py-10"><div className="flex flex-wrap items-end justify-between gap-4 mb-8"><div><p className="text-teal-600 font-semibold">Account</p><h1 className="text-4xl font-black">My Orders</h1><p className="text-gray-500 mt-2">Track purchases, cancellations and returns.</p></div><button onClick={load} className="btn-secondary"><RefreshCw size={16}/> Refresh</button></div>{error&&<div className="mb-5 rounded-xl border border-red-200 bg-red-50 text-red-700 p-4">{error}</div>}{loading?<div className="space-y-4">{[1,2,3].map(i=><div key={i} className="h-24 rounded-2xl bg-white border animate-pulse"/> )}</div>:orders.length?<div className="space-y-4">{orders.map(o=><Link key={o.id} to={`/orders/${o.id}`} className="bg-white border rounded-2xl p-5 flex items-center gap-4 hover:border-teal-300 hover:shadow-sm transition block"><div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0"><Package/></div><div className="flex-1 min-w-0"><div className="flex flex-wrap items-center justify-between gap-2"><h2 className="font-bold">Order #{o.id}</h2><span className={`text-xs font-bold px-2.5 py-1 rounded-full ${statusClass(o.status)}`}>{statusLabel(o.status)}</span></div><p className="text-sm text-gray-500 mt-1">{formatDate(o.createdAt,true)} · {o.items?.reduce((n,i)=>n+i.quantity,0)||0} items</p></div><div className="font-black whitespace-nowrap">{money(o.totalAmount)}</div><ChevronRight className="text-gray-400 shrink-0"/></Link>)}</div>:<div className="bg-white border rounded-2xl p-16 text-center"><Package className="mx-auto text-gray-300" size={55}/><h2 className="font-bold text-xl mt-4">No orders yet</h2><p className="text-gray-500 mt-2">Your completed purchases will appear here.</p><Link to="/products" className="btn-primary mt-5 inline-flex">Start shopping</Link></div>}</section>
+}

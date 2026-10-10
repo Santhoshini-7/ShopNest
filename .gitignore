@@ -1,0 +1,22 @@
+
+# Backend secrets
+**/application.properties
+**/.env
+**/.env.*
+!**/.env.example
+
+# Frontend dependencies and build files
+**/node_modules/
+**/dist/
+
+# Java build files
+**/target/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# Operating system files
+.DS_Store
+Thumbs.db
